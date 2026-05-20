@@ -1,0 +1,2358 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sport Portal — Тестовая панель</title>
+    <style>
+        :root {
+            --bg: #0f1117;
+            --card: #1a1d27;
+            --border: #2a2d3a;
+            --primary: #6366f1;
+            --primary-hover: #818cf8;
+            --success: #22c55e;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --input-bg: #0f1117;
+            --live: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            padding: 24px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .header h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+        .header p { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover { background: rgba(255,255,255,0.25); }
+        .nav-tab.active { background: white; color: #6366f1; }
+
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+        .dot.off { background: var(--error); }
+        .dot.warn { background: var(--warning); }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 20px;
+        }
+
+        .container-wide {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header .icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+
+        .card-header h2 { font-size: 16px; font-weight: 600; }
+
+        .card-header .badge {
+            margin-left: auto;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .badge-public { background: rgba(34,197,94,0.15); color: var(--success); }
+        .badge-auth { background: rgba(99,102,241,0.15); color: var(--primary-hover); }
+        .badge-admin { background: rgba(239,68,68,0.15); color: var(--error); }
+        .badge-live { background: rgba(239,68,68,0.2); color: var(--live); animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .card-body { padding: 20px; }
+
+        .form-group { margin-bottom: 14px; }
+
+        .form-group label {
+            display: block; font-size: 12px; font-weight: 600;
+            color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 6px;
+        }
+
+        input, select, textarea {
+            width: 100%; padding: 10px 14px;
+            background: var(--input-bg); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text);
+            font-size: 14px; transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        }
+
+        textarea { resize: vertical; min-height: 80px; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px; padding: 10px 20px; border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; width: 100%;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-danger { background: var(--error); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: var(--warning); color: black; }
+        .btn-outline { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; width: auto; }
+        .btn-group { display: flex; gap: 8px; margin-top: 4px; }
+
+        .response-box {
+            margin-top: 14px; background: var(--input-bg);
+            border: 1px solid var(--border); border-radius: 8px;
+            overflow: hidden; display: none;
+        }
+
+        .response-box.show { display: block; }
+
+        .response-header {
+            display: flex; align-items: center; padding: 8px 14px;
+            font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border);
+        }
+
+        .response-header.success { color: var(--success); }
+        .response-header.error { color: var(--error); }
+
+        .response-body {
+            padding: 12px 14px; font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 12px; line-height: 1.5; max-height: 250px;
+            overflow-y: auto; white-space: pre-wrap; word-break: break-all;
+            color: var(--text-muted);
+        }
+
+        .token-display {
+            background: var(--input-bg); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px 14px; margin-top: 10px;
+            font-size: 11px; font-family: monospace; word-break: break-all;
+            color: var(--success); max-height: 80px; overflow-y: auto;
+        }
+
+        .info-row {
+            display: flex; justify-content: space-between;
+            padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+        }
+
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label { color: var(--text-muted); }
+        .info-row .value { font-weight: 600; word-break: break-all; text-align: right; max-width: 60%; }
+
+        .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+        .section-title {
+            font-size: 12px; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px;
+        }
+
+        .news-item {
+            padding: 12px; background: var(--input-bg);
+            border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px;
+        }
+
+        .news-item h4 { font-size: 14px; margin-bottom: 4px; }
+        .news-item p { font-size: 12px; color: var(--text-muted); }
+
+        .tab-group {
+            display: flex; gap: 0;
+            border-bottom: 1px solid var(--border); margin-bottom: 16px;
+        }
+
+        .tab {
+            padding: 8px 16px; font-size: 13px; font-weight: 600;
+            color: var(--text-muted); cursor: pointer;
+            border-bottom: 2px solid transparent; transition: all 0.2s;
+        }
+
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab:hover { color: var(--text); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .stream-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .stream-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stream-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .stream-thumbnail {
+            height: 180px;
+            background: linear-gradient(135deg, #1a1d27, #2a2d3a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            position: relative;
+        }
+
+        .stream-status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .stream-status.live { background: var(--live); color: white; }
+        .stream-status.created { background: var(--warning); color: black; }
+        .stream-status.ended { background: var(--text-muted); color: var(--bg); }
+
+        .stream-sport {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(0,0,0,0.6);
+        }
+
+        .stream-info { padding: 14px; }
+        .stream-info h3 { font-size: 15px; margin-bottom: 6px; }
+
+        .stream-meta {
+            display: flex;
+            gap: 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .stream-actions {
+            padding: 10px 14px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+        }
+
+        .sse-log {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .sse-event {
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sse-event:last-child { border-bottom: none; }
+
+        .comment-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        .comment-item {
+            padding: 10px 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .comment-author {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-hover);
+            margin-bottom: 2px;
+        }
+
+        .comment-text { font-size: 13px; }
+
+        .comment-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .likes-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .like-count {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--live);
+        }
+
+        .like-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid var(--live);
+            background: transparent;
+            color: var(--live);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .like-btn:hover, .like-btn.liked {
+            background: var(--live);
+            color: white;
+        }
+
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            padding: 12px 20px; border-radius: 8px; font-size: 14px;
+            font-weight: 600; z-index: 1000;
+            transform: translateY(100px); opacity: 0; transition: all 0.3s ease;
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--success); color: white; }
+        .toast.error { background: var(--error); color: white; }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; padding: 12px; }
+            .stream-grid { grid-template-columns: 1fr; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>? Sport Portal — Тестовая панель</h1>
+    <p>Проверка всех API эндпоинтов</p>
+    <div class="nav-tabs">
+        <button class="nav-tab active" onclick="showPage('general', this)">?? Основное</button>
+        <button class="nav-tab" onclick="showPage('streaming', this)">?? Стриминг</button>
+        <button class="nav-tab" onclick="showPage('viewer', this)">??? Зритель</button>
+    </div>
+    <div class="status-bar">
+        <div class="status-item"><div class="dot" id="apiDot"></div><span id="apiStatus">API: проверка...</span></div>
+        <div class="status-item"><div class="dot off" id="authDot"></div><span id="authStatus">Не авторизован</span></div>
+        <div class="status-item"><div class="dot off" id="adminDot"></div><span id="adminStatus">Не админ</span></div>
+        <div class="status-item"><div class="dot off" id="sseDot"></div><span id="sseStatus">SSE: отключен</span></div>
+    </div>
+</div>
+
+<!-- ======================== PAGE: GENERAL ======================== -->
+<div id="page-general" class="page active">
+<div class="container">
+
+    <!-- Registration -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">??</div>
+            <h2>Регистрация</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <div class="tab-group">
+                <div class="tab active" onclick="switchTab('reg', 'email', this)">?? Email</div>
+                <div class="tab" onclick="switchTab('reg', 'phone', this)">?? Телефон</div>
+            </div>
+            <div id="reg-email" class="tab-content active">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" placeholder="user@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="regPassword" placeholder="Минимум 8 символов" value="password123">
+                </div>
+                <button class="btn btn-success" onclick="register()">Зарегистрироваться</button>
+            </div>
+            <div id="reg-phone" class="tab-content">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmailPhone" placeholder="user@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="regPasswordPhone" placeholder="Минимум 8 символов" value="password123">
+                </div>
+                <div class="form-group">
+                    <label>Firebase Token</label>
+                    <input type="text" id="regFirebaseToken" placeholder="ID Token от Firebase">
+                </div>
+                <button class="btn btn-success" onclick="registerPhone()">Зарегистрироваться (Phone)</button>
+            </div>
+            <div id="regResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- Verify Email -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;">??</div>
+            <h2>Подтверждение Email</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="verifyEmail" placeholder="user@example.com">
+            </div>
+            <div class="form-group">
+                <label>Код (6 цифр)</label>
+                <input type="text" id="verifyCode" placeholder="123456" maxlength="6">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="verifyEmail()" style="flex:2">Подтвердить</button>
+                <button class="btn btn-outline" onclick="resendCode()" style="flex:1">Отправить код</button>
+            </div>
+            <div id="verifyResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- Login -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(99,102,241,0.15);color:#6366f1;">??</div>
+            <h2>Авторизация</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" value="admin@sportportal.com">
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" value="admin123">
+            </div>
+            <button class="btn btn-primary" onclick="login()">Войти</button>
+            <div class="btn-group" style="margin-top:8px">
+                <button class="btn btn-outline btn-sm" onclick="refreshToken()">?? Обновить токен</button>
+                <button class="btn btn-outline btn-sm" onclick="logout()">?? Выйти</button>
+            </div>
+            <div id="tokenDisplay" class="token-display" style="display:none"></div>
+            <div id="loginResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- User Profile -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(99,102,241,0.15);color:#818cf8;">??</div>
+            <h2>Профиль</h2>
+            <span class="badge badge-auth">AUTH</span>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-primary" onclick="getMe()">Получить профиль</button>
+            <div id="profileInfo" style="margin-top:14px;display:none">
+                <div class="info-row"><span class="label">ID</span><span class="value" id="profileId">—</span></div>
+                <div class="info-row"><span class="label">Email</span><span class="value" id="profileEmail">—</span></div>
+                <div class="info-row"><span class="label">Телефон</span><span class="value" id="profilePhone">—</span></div>
+                <div class="info-row"><span class="label">Роль</span><span class="value" id="profileRole">—</span></div>
+                <div class="info-row"><span class="label">Верифицирован</span><span class="value" id="profileVerified">—</span></div>
+                <div class="info-row"><span class="label">Создан</span><span class="value" id="profileCreated">—</span></div>
+            </div>
+            <div id="profileResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- News -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(59,130,246,0.15);color:#3b82f6;">??</div>
+            <h2>Новости</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <div class="btn-group" style="margin-bottom:14px">
+                <button class="btn btn-primary btn-sm" onclick="loadNews()">Загрузить новости</button>
+                <button class="btn btn-outline btn-sm" onclick="loadCategories()">Категории</button>
+            </div>
+            <div id="newsList"></div>
+            <div id="newsResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- Federations -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(168,85,247,0.15);color:#a855f7;">??</div>
+            <h2>Федерации</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-primary" onclick="loadFederations()">Загрузить федерации</button>
+            <div id="fedsList" style="margin-top:14px"></div>
+            <div id="fedsResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- Admin: Users -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">??</div>
+            <h2>Пользователи (Админ)</h2>
+            <span class="badge badge-admin">ADMIN</span>
+        </div>
+        <div class="card-body">
+            <div class="btn-group" style="margin-bottom:14px">
+                <button class="btn btn-danger btn-sm" onclick="loadUsers()" style="flex:2">Загрузить пользователей</button>
+                <button class="btn btn-outline btn-sm" onclick="deleteNonAdmins()" style="flex:1;border-color:var(--error);color:var(--error)">??? Удалить не-админов</button>
+            </div>
+            <div id="usersList" style="margin-top:14px"></div>
+            <div id="usersResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;">???</div>
+            <h2>Полезные ссылки</h2>
+        </div>
+        <div class="card-body">
+            <p class="section-title">Быстрые действия</p>
+            <div class="btn-group" style="flex-direction:column;gap:8px">
+                <a href="/admin" class="btn btn-primary" target="_blank">??? Открыть админку</a>
+                <button class="btn btn-outline" onclick="healthCheck()">?? API Health Check</button>
+            </div>
+            <div class="divider"></div>
+            <p class="section-title">Информация</p>
+            <div class="info-row"><span class="label">API Base</span><span class="value">/api/v1</span></div>
+            <div class="info-row"><span class="label">Админ логин</span><span class="value">admin@sportportal.com</span></div>
+            <div class="info-row"><span class="label">Админ пароль</span><span class="value">admin123</span></div>
+            <div id="healthResponse" class="response-box"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ======================== PAGE: STREAMING (Admin) ======================== -->
+<div id="page-streaming" class="page">
+<div class="container-wide">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+        <!-- Create Stream Session -->
+        <div class="card">
+            <div class="card-header">
+                <div class="icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">??</div>
+                <h2>Создать стрим-сессию</h2>
+                <span class="badge badge-admin">ADMIN</span>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Название стрима</label>
+                    <input type="text" id="streamTitle" placeholder="Например: Финал Чемпионата по футболу">
+                </div>
+                <div class="form-group">
+                    <label>Вид спорта</label>
+                    <select id="streamSport">
+                        <option value="">— Не указан —</option>
+                        <option value="football">? Футбол</option>
+                        <option value="volleyball">?? Волейбол</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Режим трансляции</label>
+                    <select id="streamIngestMode">
+                        <option value="webrtc">WebRTC (низкая задержка)</option>
+                        <option value="rtmp">RTMP (OBS/FFmpeg)</option>
+                    </select>
+                </div>
+                <button class="btn btn-danger" onclick="createStream()">?? Создать стрим</button>
+                <div id="createStreamResponse" class="response-box"></div>
+                <div id="publishInfo" style="display:none;margin-top:14px;">
+                    <p class="section-title">Данные для публикации</p>
+                    <div class="info-row"><span class="label">Stream ID</span><span class="value" id="pubStreamId">—</span></div>
+                    <div class="info-row"><span class="label">Протокол</span><span class="value" id="pubProtocol">—</span></div>
+                    <div class="info-row"><span class="label">WHIP Path</span><span class="value" id="pubWhipPath">—</span></div>
+                    <div class="info-row"><span class="label">RTMP URL</span><span class="value" id="pubRtmpUrl">—</span></div>
+                    <div class="info-row"><span class="label">SRS API</span><span class="value" id="pubSrsApi">—</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Streams -->
+        <div class="card">
+            <div class="card-header">
+                <div class="icon" style="background:rgba(99,102,241,0.15);color:#818cf8;">??</div>
+                <h2>Управление стримами</h2>
+                <span class="badge badge-admin">ADMIN</span>
+            </div>
+            <div class="card-body">
+                <div class="btn-group" style="margin-bottom:14px">
+                    <button class="btn btn-primary btn-sm" onclick="loadStreams()" style="flex:2">?? Обновить список</button>
+                    <button class="btn btn-outline btn-sm" onclick="loadLiveStreams()">?? Только LIVE</button>
+                    <button class="btn btn-outline btn-sm" onclick="deleteAllStreams()" style="border-color:var(--error);color:var(--error)">??? Удалить все</button>
+                </div>
+                <div class="divider"></div>
+                <p class="section-title">Симулятор SRS Webhook</p>
+                <div class="form-group">
+                    <label>Stream ID</label>
+                    <input type="text" id="webhookStreamId" placeholder="UUID стрима">
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success btn-sm" onclick="simulateWebhook('on_publish')">?? on_publish</button>
+                    <button class="btn btn-danger btn-sm" onclick="simulateWebhook('on_unpublish')">?? on_unpublish</button>
+                </div>
+                <div id="webhookResponse" class="response-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stream Sessions List -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">??</div>
+            <h2>Стрим-сессии</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <div id="streamsList" class="stream-grid">
+                <p style="color:var(--text-muted);font-size:13px;grid-column:1/-1;text-align:center;padding:40px 0;">
+                    Нажмите «Обновить список» чтобы загрузить стримы
+                </p>
+            </div>
+            <div id="streamsResponse" class="response-box"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ======================== PAGE: VIEWER ======================== -->
+<div id="page-viewer" class="page">
+<div class="container-wide">
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;">
+
+        <!-- Stream View & SSE -->
+        <div>
+            <div class="card" style="margin-bottom:20px;">
+                <div class="card-header">
+                    <div class="icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">???</div>
+                    <h2>Просмотр стрима</h2>
+                    <span class="badge badge-auth">AUTH</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Stream ID (для подключения)</label>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" id="viewStreamId" placeholder="Введите UUID стрима или выберите из списка">
+                            <button class="btn btn-primary btn-sm" onclick="connectToStream()" style="white-space:nowrap;">?? Подключиться</button>
+                            <button class="btn btn-outline btn-sm" onclick="disconnectSSE()" style="white-space:nowrap;">? Отключить</button>
+                        </div>
+                    </div>
+                    <div id="quickStreamSelect" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
+                </div>
+            </div>
+
+            <!-- Playback -->
+            <div class="card" style="margin-bottom:20px;">
+                <div class="card-header">
+                    <div class="icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">??</div>
+                    <h2>Playback</h2>
+                </div>
+                <div class="card-body">
+                    <button class="btn btn-success" onclick="getPlaybackGrant()">Получить Playback Grant</button>
+                    <div id="playbackInfo" style="display:none;margin-top:14px;">
+                        <div class="info-row"><span class="label">WebRTC URL</span><span class="value" id="playbackUrl">—</span></div>
+                        <div class="info-row"><span class="label">Expires</span><span class="value" id="playbackExpires">—</span></div>
+                    </div>
+                    <div id="playbackResponse" class="response-box"></div>
+                </div>
+            </div>
+
+            <!-- SSE Events Log -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;">??</div>
+                    <h2>SSE события (реальное время)</h2>
+                    <span class="badge" id="sseCountBadge" style="background:rgba(99,102,241,0.15);color:var(--primary-hover);">0 events</span>
+                </div>
+                <div class="card-body">
+                    <div id="sseLog" class="sse-log">
+                        <div style="color:var(--text-muted);text-align:center;padding:20px;">
+                            Подключитесь к стриму чтобы видеть события в реальном времени
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right sidebar: Likes + Comments -->
+        <div>
+            <!-- Likes -->
+            <div class="card" style="margin-bottom:20px;">
+                <div class="card-header">
+                    <div class="icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">??</div>
+                    <h2>Лайки</h2>
+                </div>
+                <div class="card-body">
+                    <div class="likes-display">
+                        <span class="like-count" id="streamLikeCount">0</span>
+                        <span style="color:var(--text-muted);font-size:13px">лайков</span>
+                        <div style="margin-left:auto;display:flex;gap:8px;">
+                            <button class="like-btn" id="likeBtn" onclick="toggleStreamLike()">?? Лайк</button>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-outline btn-sm" onclick="getStreamLikes()">?? Обновить</button>
+                        <button class="btn btn-outline btn-sm" onclick="incrementStreamLikes()">?? +5 лайков</button>
+                    </div>
+                    <div id="likesResponse" class="response-box"></div>
+                </div>
+            </div>
+
+            <!-- Comments -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon" style="background:rgba(59,130,246,0.15);color:#3b82f6;">??</div>
+                    <h2>Комментарии</h2>
+                </div>
+                <div class="card-body">
+                    <div id="commentsList" class="comment-list">
+                        <div style="color:var(--text-muted);text-align:center;padding:20px;font-size:13px;">
+                            Подключитесь к стриму и напишите первый комментарий
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" id="commentText" placeholder="Написать комментарий..." style="flex:1" onkeypress="if(event.key==='Enter')postComment()">
+                        <button class="btn btn-primary btn-sm" onclick="postComment()" style="white-space:nowrap;">Отправить</button>
+                    </div>
+                    <div class="btn-group" style="margin-top:8px">
+                        <button class="btn btn-outline btn-sm" onclick="loadComments()">?? Загрузить все</button>
+                    </div>
+                    <div id="commentsResponse" class="response-box"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const API = '/api/v1';
+let accessToken = localStorage.getItem('access_token') || '';
+let refreshTokenValue = localStorage.getItem('refresh_token') || '';
+let currentStreamId = '';
+let sseSource = null;
+let sseEventCount = 0;
+
+// ======================== INIT ========================
+document.addEventListener('DOMContentLoaded', () => {
+    checkApiStatus();
+    if (accessToken) {
+        updateAuthStatus(true);
+        getMe();
+    }
+});
+
+// ======================== NAVIGATION ========================
+function showPage(page, btn) {
+    document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    if (page === 'streaming') loadStreams();
+    if (page === 'viewer') loadQuickStreamSelect();
+}
+
+// ======================== UTILS ========================
+async function apiCall(method, path, body, auth) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (auth && accessToken) headers['Authorization'] = 'Bearer ' + accessToken;
+
+    const opts = { method, headers };
+    if (body) opts.body = JSON.stringify(body);
+
+    const res = await fetch(API + path, opts);
+    const data = await res.json().catch(() => ({}));
+    return { status: res.status, ok: res.ok, data };
+}
+
+function showResponse(elementId, result) {
+    const box = document.getElementById(elementId);
+    if (!box) return;
+    box.className = 'response-box show';
+    box.innerHTML =
+        '<div class="response-header ' + (result.ok ? 'success' : 'error') + '">'
+        + (result.ok ? '?' : '?') + ' HTTP ' + result.status
+        + '</div>'
+        + '<div class="response-body">' + escapeHtml(JSON.stringify(result.data, null, 2)) + '</div>';
+}
+
+function toast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + (type || 'success') + ' show';
+    setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+function switchTab(group, tab, btn) {
+    const body = btn.closest('.card-body');
+    body.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    body.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+    document.getElementById(group + '-' + tab).classList.add('active');
+    btn.classList.add('active');
+}
+
+function updateAuthStatus(loggedIn, isAdmin) {
+    document.getElementById('authDot').className = loggedIn ? 'dot' : 'dot off';
+    document.getElementById('authStatus').textContent = loggedIn ? 'Авторизован' : 'Не авторизован';
+    document.getElementById('adminDot').className = isAdmin ? 'dot' : 'dot off';
+    document.getElementById('adminStatus').textContent = isAdmin ? 'Админ ?' : 'Не админ';
+}
+
+async function checkApiStatus() {
+    try {
+        const res = await fetch(API + '/news?page=1&limit=1');
+        document.getElementById('apiDot').className = res.ok ? 'dot' : 'dot warn';
+        document.getElementById('apiStatus').textContent = res.ok ? 'API: онлайн' : 'API: ошибка ' + res.status;
+    } catch {
+        document.getElementById('apiDot').className = 'dot off';
+        document.getElementById('apiStatus').textContent = 'API: недоступен';
+    }
+}
+
+function escapeHtml(text) {
+    const d = document.createElement('div');
+    d.textContent = text || '';
+    return d.innerHTML;
+}
+
+function sportEmoji(sport) {
+    return sport === 'football' ? '?' : sport === 'volleyball' ? '??' : '???';
+}
+
+function statusIcon(status) {
+    return status === 'live' ? '??' : status === 'created' ? '??' : '?';
+}
+
+// ======================== AUTH ========================
+async function register() {
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    if (!email || !password) return toast('Заполните все поля', 'error');
+    const result = await apiCall('POST', '/auth/register', { email, password });
+    showResponse('regResponse', result);
+    toast(result.ok ? 'Пользователь создан! Проверьте email.' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+}
+
+async function registerPhone() {
+    const email = document.getElementById('regEmailPhone').value;
+    const password = document.getElementById('regPasswordPhone').value;
+    const firebase_token = document.getElementById('regFirebaseToken').value;
+    if (!email || !password || !firebase_token) return toast('Заполните все поля', 'error');
+    const result = await apiCall('POST', '/auth/register', { email, password, firebase_token });
+    showResponse('regResponse', result);
+    toast(result.ok ? 'Зарегистрирован через телефон!' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+}
+
+async function verifyEmail() {
+    const email = document.getElementById('verifyEmail').value;
+    const code = document.getElementById('verifyCode').value;
+    if (!email || !code) return toast('Заполните все поля', 'error');
+    const result = await apiCall('POST', '/auth/verify', { email, code });
+    showResponse('verifyResponse', result);
+    toast(result.ok ? 'Email подтверждён!' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+}
+
+async function resendCode() {
+    const email = document.getElementById('verifyEmail').value;
+    if (!email) return toast('Введите email', 'error');
+    const result = await apiCall('POST', '/auth/resend-code', { email });
+    showResponse('verifyResponse', result);
+    toast(result.ok ? 'Код отправлен!' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+}
+
+async function login() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) return toast('Заполните все поля', 'error');
+    const result = await apiCall('POST', '/auth/login', { email, password });
+    showResponse('loginResponse', result);
+
+    if (result.ok) {
+        accessToken = result.data.data.access_token;
+        refreshTokenValue = result.data.data.refresh_token;
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', refreshTokenValue);
+        const user = result.data.data.user;
+        updateAuthStatus(true, user.role === 'admin');
+        document.getElementById('tokenDisplay').style.display = 'block';
+        document.getElementById('tokenDisplay').textContent = 'Token: ' + accessToken.substring(0, 50) + '...';
+        toast('Вход выполнен! ' + (user.role === 'admin' ? '(Админ)' : '(Пользователь)'));
+    } else {
+        toast(result.data.message || 'Ошибка входа', 'error');
+    }
+}
+
+async function refreshToken() {
+    if (!refreshTokenValue) return toast('Нет refresh токена', 'error');
+    const result = await apiCall('POST', '/auth/refresh', { refresh_token: refreshTokenValue });
+    showResponse('loginResponse', result);
+    if (result.ok) {
+        accessToken = result.data.data.access_token;
+        refreshTokenValue = result.data.data.refresh_token;
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', refreshTokenValue);
+        document.getElementById('tokenDisplay').textContent = 'Token (обновлён): ' + accessToken.substring(0, 50) + '...';
+        toast('Токен обновлён!');
+    } else toast('Ошибка обновления', 'error');
+}
+
+function logout() {
+    accessToken = '';
+    refreshTokenValue = '';
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    document.getElementById('tokenDisplay').style.display = 'none';
+    updateAuthStatus(false);
+    disconnectSSE();
+    toast('Вы вышли');
+}
+
+// ======================== PROFILE ========================
+async function getMe() {
+    if (!accessToken) return toast('Сначала авторизуйтесь', 'error');
+    const result = await apiCall('GET', '/users/me', null, true);
+    showResponse('profileResponse', result);
+    if (result.ok) {
+        const u = result.data.data;
+        document.getElementById('profileInfo').style.display = 'block';
+        document.getElementById('profileId').textContent = u.id;
+        document.getElementById('profileEmail').textContent = u.email;
+        document.getElementById('profilePhone').textContent = u.phone || '—';
+        document.getElementById('profileRole').textContent = u.role;
+        document.getElementById('profileVerified').textContent = u.is_verified ? '? Да' : '? Нет';
+        document.getElementById('profileCreated').textContent = new Date(u.created_at).toLocaleString('ru');
+        updateAuthStatus(true, u.role === 'admin');
+    }
+}
+
+// ======================== NEWS ========================
+async function loadNews() {
+    const result = await apiCall('GET', '/news?page=1&limit=5');
+    showResponse('newsResponse', result);
+    if (result.ok) {
+        const items = result.data.data || [];
+        document.getElementById('newsList').innerHTML = items.length === 0
+            ? '<p style="color:var(--text-muted);font-size:13px">Нет новостей.</p>'
+            : items.map(n =>
+                '<div class="news-item"><h4>' + escapeHtml(n.title) + '</h4>'
+                + '<p>' + escapeHtml((n.content || '').substring(0, 100)) + '...</p>'
+                + '<div style="display:flex;gap:12px;margin-top:6px;font-size:11px;color:var(--text-muted)">'
+                + '<span>?? ' + (n.likes_count || 0) + '</span>'
+                + '<span>?? ' + (n.shares_count || 0) + '</span>'
+                + (accessToken ? '<span style="cursor:pointer;color:var(--primary)" onclick="toggleNewsLike(\'' + n.id + '\')">?? Лайк</span>' : '')
+                + '</div></div>'
+            ).join('');
+    }
+}
+
+async function toggleNewsLike(newsId) {
+    if (!accessToken) return toast('Сначала авторизуйтесь', 'error');
+    const result = await apiCall('POST', '/news/' + newsId + '/like', null, true);
+    toast(result.ok ? 'Лайк!' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+    if (result.ok) loadNews();
+}
+
+async function loadCategories() {
+    const result = await apiCall('GET', '/categories');
+    showResponse('newsResponse', result);
+    toast(result.ok ? 'Категорий: ' + (result.data.data || []).length : 'Ошибка', result.ok ? 'success' : 'error');
+}
+
+// ======================== FEDERATIONS ========================
+async function loadFederations() {
+    const result = await apiCall('GET', '/federations');
+    showResponse('fedsResponse', result);
+    if (result.ok) {
+        const items = result.data.data || [];
+        document.getElementById('fedsList').innerHTML = items.length === 0
+            ? '<p style="color:var(--text-muted);font-size:13px">Нет федераций.</p>'
+            : items.map(f =>
+                '<div class="news-item"><h4>' + escapeHtml(f.name) + '</h4>'
+                + '<p>' + escapeHtml((f.description || '').substring(0, 100)) + '</p></div>'
+            ).join('');
+    }
+}
+
+// ======================== ADMIN USERS ========================
+async function loadUsers() {
+    if (!accessToken) return toast('Сначала авторизуйтесь', 'error');
+    const result = await apiCall('GET', '/admin/users', null, true);
+    showResponse('usersResponse', result);
+    if (result.ok) {
+        const items = result.data.data || [];
+        document.getElementById('usersList').innerHTML = items.map(u =>
+            '<div class="news-item"><h4>' + escapeHtml(u.email) + ' <span style="font-size:11px;color:' + (u.role === 'admin' ? 'var(--error)' : 'var(--primary)') + '">[' + u.role + ']</span></h4>'
+            + '<p>' + (u.is_verified ? '? Верифицирован' : '? Не верифицирован') + ' · ' + (u.phone || 'Нет телефона') + '</p></div>'
+        ).join('');
+    }
+}
+
+async function deleteNonAdmins() {
+    if (!accessToken) return toast('Сначала авторизуйтесь как админ', 'error');
+    if (!confirm('Удалить ВСЕХ пользователей кроме админов?')) return;
+    const result = await apiCall('DELETE', '/admin/users', null, true);
+    showResponse('usersResponse', result);
+    toast(result.ok ? result.data.message : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+    if (result.ok) loadUsers();
+}
+
+// ======================== HEALTH ========================
+async function healthCheck() {
+    const endpoints = [
+        { method: 'GET', path: '/news?page=1&limit=1', name: 'News' },
+        { method: 'GET', path: '/categories', name: 'Categories' },
+        { method: 'GET', path: '/federations', name: 'Federations' },
+        { method: 'GET', path: '/streams', name: 'Streams' },
+        { method: 'GET', path: '/streams/live', name: 'Live Streams' },
+    ];
+    let results = [];
+    for (const ep of endpoints) {
+        try {
+            const r = await apiCall(ep.method, ep.path);
+            results.push((r.ok ? '?' : '?') + ' ' + ep.name + ': HTTP ' + r.status);
+        } catch {
+            results.push('? ' + ep.name + ': Недоступен');
+        }
+    }
+    showResponse('healthResponse', { ok: true, status: 200, data: results.join('\n') });
+    toast('Health check завершён');
+}
+
+// ======================== STREAMING (Admin) ========================
+async function createStream() {
+    if (!accessToken) return toast('Сначала авторизуйтесь как админ', 'error');
+    const title = document.getElementById('streamTitle').value;
+    const sport = document.getElementById('streamSport').value;
+    const ingest_mode = document.getElementById('streamIngestMode').value;
+    if (!title) return toast('Введите название стрима', 'error');
+    const body = { title, ingest_mode };
+    if (sport) body.sport = sport;
+    const result = await apiCall('POST', '/admin/streams', body, true);
+    showResponse('createStreamResponse', result);
+    if (result.ok) {
+        const d = result.data.data;
+        const session = d.session;
+        const pub = d.publish;
+        document.getElementById('publishInfo').style.display = 'block';
+        document.getElementById('pubStreamId').textContent = session.id;
+        document.getElementById('pubProtocol').textContent = pub.protocol;
+        document.getElementById('pubWhipPath').textContent = pub.whip_path || '—';
+        document.getElementById('pubRtmpUrl').textContent = pub.rtmp_url || '—';
+        document.getElementById('pubSrsApi').textContent = pub.srs_api || '—';
+        document.getElementById('webhookStreamId').value = session.id;
+        toast('Стрим создан! ID: ' + session.id);
+        loadStreams();
+    } else {
+        toast(result.data.message || 'Ошибка создания стрима', 'error');
+    }
+}
+
+async function loadStreams() {
+    const result = await apiCall('GET', '/streams');
+    showResponse('streamsResponse', result);
+    if (result.ok) {
+        const items = result.data.data || [];
+        const grid = document.getElementById('streamsList');
+        if (items.length === 0) {
+            grid.innerHTML = '<p style="color:var(--text-muted);font-size:13px;grid-column:1/-1;text-align:center;padding:40px 0;">Нет стрим-сессий. Создайте первую!</p>';
+        } else {
+            grid.innerHTML = items.map(s =>
+                '<div class="stream-card">'
+                + '<div class="stream-thumbnail">' + sportEmoji(s.sport)
+                + '<div class="stream-status ' + s.status + '">' + statusIcon(s.status) + ' ' + s.status.toUpperCase() + '</div>'
+                + (s.sport ? '<div class="stream-sport">' + s.sport + '</div>' : '')
+                + '</div>'
+                + '<div class="stream-info"><h3>' + escapeHtml(s.title) + '</h3>'
+                + '<div class="stream-meta">'
+                + '<span>?? ' + (s.likes_count || 0) + '</span>'
+                + '<span>?? ' + (s.comments_count || 0) + '</span>'
+                + '<span>?? ' + s.ingest_mode + '</span>'
+                + '<span style="color:var(--text-muted)">' + new Date(s.created_at).toLocaleString('ru') + '</span>'
+                + '</div></div>'
+                + '<div class="stream-actions">'
+                + '<button class="btn btn-primary btn-sm" onclick="selectStream(\'' + s.id + '\')">??? Смотреть</button>'
+                + '<button class="btn btn-outline btn-sm" onclick="document.getElementById(\'webhookStreamId\').value=\'' + s.id + '\'">?? Webhook</button>'
+                + '<button class="btn btn-outline btn-sm" onclick="deleteStream(\'' + s.id + '\')" style="border-color:var(--error);color:var(--error)">???</button>'
+                + '</div></div>'
+            ).join('');
+        }
+    }
+}
+
+async function loadLiveStreams() {
+    const result = await apiCall('GET', '/streams/live');
+    showResponse('streamsResponse', result);
+    if (result.ok) {
+        const items = result.data.data || [];
+        toast('Активных стримов: ' + items.length);
+        const grid = document.getElementById('streamsList');
+        if (items.length === 0) {
+            grid.innerHTML = '<p style="color:var(--text-muted);font-size:13px;grid-column:1/-1;text-align:center;padding:40px 0;">Нет активных стримов</p>';
+        } else {
+            grid.innerHTML = items.map(s =>
+                '<div class="stream-card">'
+                + '<div class="stream-thumbnail">' + sportEmoji(s.sport)
+                + '<div class="stream-status live">?? LIVE</div>'
+                + (s.sport ? '<div class="stream-sport">' + s.sport + '</div>' : '')
+                + '</div>'
+                + '<div class="stream-info"><h3>' + escapeHtml(s.title) + '</h3>'
+                + '<div class="stream-meta">'
+                + '<span>?? ' + (s.likes_count||0) + '</span><span>?? ' + (s.comments_count||0) + '</span>'
+                + '</div></div>'
+                + '<div class="stream-actions"><button class="btn btn-primary btn-sm" onclick="selectStream(\'' + s.id + '\')">??? Смотреть</button></div>'
+                + '</div>'
+            ).join('');
+        }
+    }
+}
+
+async function deleteStream(id) {
+    if (!confirm('Удалить стрим-сессию?')) return;
+    const result = await apiCall('DELETE', '/admin/streams/' + id, null, true);
+    toast(result.ok ? 'Стрим удалён' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+    if (result.ok) loadStreams();
+}
+
+async function deleteAllStreams() {
+    if (!confirm('Удалить ВСЕ стрим-сессии?')) return;
+    const result = await apiCall('DELETE', '/admin/streams', null, true);
+    toast(result.ok ? 'Все стримы удалены' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+    if (result.ok) loadStreams();
+}
+
+async function simulateWebhook(action) {
+    const stream = document.getElementById('webhookStreamId').value;
+    if (!stream) return toast('Введите Stream ID', 'error');
+    const result = await apiCall('POST', '/streams/srs-webhook', { action: action, stream: stream, app: 'live' });
+    showResponse('webhookResponse', result);
+    toast(result.ok ? 'Webhook ' + action + ' отправлен!' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+    if (result.ok) loadStreams();
+}
+
+// ======================== VIEWER ========================
+function selectStream(id) {
+    currentStreamId = id;
+    document.getElementById('viewStreamId').value = id;
+    showPage('viewer');
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-tab')[2].classList.add('active');
+    connectToStream();
+}
+
+async function loadQuickStreamSelect() {
+    try {
+        const result = await apiCall('GET', '/streams');
+        if (result.ok) {
+            const items = result.data.data || [];
+            document.getElementById('quickStreamSelect').innerHTML = items.map(s =>
+                '<button class="btn btn-outline btn-sm" onclick="document.getElementById(\'viewStreamId\').value=\'' + s.id + '\';connectToStream();" title="' + escapeHtml(s.title) + '">'
+                + statusIcon(s.status) + ' ' + escapeHtml(s.title.substring(0, 20)) + (s.title.length > 20 ? '...' : '')
+                + '</button>'
+            ).join('');
+        }
+    } catch (e) {}
+}
+
+function connectToStream() {
+    const streamId = document.getElementById('viewStreamId').value;
+    if (!streamId) return toast('Введите Stream ID', 'error');
+    currentStreamId = streamId;
+    disconnectSSE();
+    sseEventCount = 0;
+    document.getElementById('sseCountBadge').textContent = '0 events';
+    document.getElementById('sseLog').innerHTML = '';
+
+    const url = API + '/streams/subscribe?streamId=' + encodeURIComponent(streamId);
+    sseSource = new EventSource(url);
+
+    sseSource.addEventListener('init', function(e) {
+        logSSEEvent('init', e.data);
+        try {
+            const data = JSON.parse(e.data);
+            document.getElementById('streamLikeCount').textContent = data.likes || 0;
+            if (data.comments && data.comments.length > 0) renderComments(data.comments);
+        } catch (err) {}
+    });
+
+    sseSource.addEventListener('likes', function(e) {
+        logSSEEvent('likes', e.data);
+        try {
+            const data = JSON.parse(e.data);
+            document.getElementById('streamLikeCount').textContent = data.likes || 0;
+        } catch (err) {}
+    });
+
+    sseSource.addEventListener('comment', function(e) {
+        logSSEEvent('comment', e.data);
+        try {
+            appendComment(JSON.parse(e.data));
+        } catch (err) {}
+    });
+
+    sseSource.addEventListener('status', function(e) {
+        logSSEEvent('status', e.data);
+    });
+
+    sseSource.onerror = function() {
+        logSSEEvent('error', 'Connection lost');
+        document.getElementById('sseDot').className = 'dot off';
+        document.getElementById('sseStatus').textContent = 'SSE: ошибка';
+    };
+
+    sseSource.onopen = function() {
+        document.getElementById('sseDot').className = 'dot';
+        document.getElementById('sseStatus').textContent = 'SSE: подключен к ' + streamId.substring(0, 8) + '...';
+        toast('Подключен к стриму');
+    };
+
+    loadComments();
+    getStreamLikes();
+}
+
+function disconnectSSE() {
+    if (sseSource) { sseSource.close(); sseSource = null; }
+    document.getElementById('sseDot').className = 'dot off';
+    document.getElementById('sseStatus').textContent = 'SSE: отключен';
+}
+
+function logSSEEvent(type, data) {
+    sseEventCount++;
+    document.getElementById('sseCountBadge').textContent = sseEventCount + ' events';
+    var log = document.getElementById('sseLog');
+    var time = new Date().toLocaleTimeString('ru');
+    var colors = { init: '#22c55e', likes: '#ef4444', comment: '#3b82f6', status: '#f59e0b', error: '#ef4444' };
+    var displayData = data;
+    try { displayData = JSON.stringify(JSON.parse(data), null, 2); } catch (e) {}
+    var div = document.createElement('div');
+    div.className = 'sse-event';
+    div.innerHTML = '<span style="color:' + (colors[type] || 'var(--text-muted)') + ';font-weight:600;">[' + time + '] ' + type + '</span>'
+        + '<pre style="margin:4px 0 0;font-size:11px;color:var(--text-muted);white-space:pre-wrap;word-break:break-all;">' + escapeHtml(displayData) + '</pre>';
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+}
+
+// ======================== LIKES ========================
+async function toggleStreamLike() {
+    if (!accessToken) return toast('Сначала авторизуйтесь', 'error');
+    if (!currentStreamId) return toast('Выберите стрим', 'error');
+    const result = await apiCall('POST', '/streams/like', { stream_id: currentStreamId }, true);
+    showResponse('likesResponse', result);
+    if (result.ok) {
+        const d = result.data.data;
+        document.getElementById('streamLikeCount').textContent = d.likes || 0;
+        const btn = document.getElementById('likeBtn');
+        if (d.liked) { btn.classList.add('liked'); btn.textContent = '?? Liked'; }
+        else { btn.classList.remove('liked'); btn.textContent = '?? Лайк'; }
+        toast(d.liked ? 'Лайк поставлен!' : 'Лайк убран');
+    } else toast(result.data.message || 'Ошибка', 'error');
+}
+
+async function incrementStreamLikes() {
+    if (!accessToken) return toast('Сначала авторизуйтесь', 'error');
+    if (!currentStreamId) return toast('Выберите стрим', 'error');
+    const result = await apiCall('POST', '/streams/like-inc', { stream_id: currentStreamId, delta: 5 }, true);
+    showResponse('likesResponse', result);
+    if (result.ok) {
+        document.getElementById('streamLikeCount').textContent = result.data.data.likes || 0;
+        toast('+5 лайков!');
+    } else toast(result.data.message || 'Ошибка', 'error');
+}
+
+async function getStreamLikes() {
+    if (!currentStreamId) return;
+    const result = await apiCall('POST', '/streams/likes', { stream_id: currentStreamId }, true);
+    showResponse('likesResponse', result);
+    if (result.ok) {
+        const d = result.data.data;
+        document.getElementById('streamLikeCount').textContent = d.likes || 0;
+        const btn = document.getElementById('likeBtn');
+        if (d.liked) { btn.classList.add('liked'); btn.textContent = '?? Liked'; }
+        else { btn.classList.remove('liked'); btn.textContent = '?? Лайк'; }
+    }
+}
+
+// ======================== COMMENTS ========================
+async function postComment() {
+    if (!accessToken) return toast('Сначала авторизуйтесь', 'error');
+    if (!currentStreamId) return toast('Выберите стрим', 'error');
+    const text = document.getElementById('commentText').value.trim();
+    if (!text) return toast('Напишите комментарий', 'error');
+    const result = await apiCall('POST', '/streams/comment', { stream_id: currentStreamId, text: text }, true);
+    showResponse('commentsResponse', result);
+    if (result.ok) {
+        document.getElementById('commentText').value = '';
+        toast('Комментарий отправлен!');
+        if (result.data.data) appendComment(result.data.data);
+    } else toast(result.data.message || 'Ошибка', 'error');
+}
+
+async function loadComments() {
+    if (!currentStreamId) return;
+    const result = await apiCall('POST', '/streams/comments', { stream_id: currentStreamId }, true);
+    showResponse('commentsResponse', result);
+    if (result.ok) {
+        const items = result.data.data?.items || result.data.data || [];
+        renderComments(items);
+    }
+}
+
+function renderComments(comments) {
+    var list = document.getElementById('commentsList');
+    if (!comments || comments.length === 0) {
+        list.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:20px;font-size:13px;">Нет комментариев</div>';
+        return;
+    }
+    list.innerHTML = comments.map(commentHtml).join('');
+    list.scrollTop = list.scrollHeight;
+}
+
+function appendComment(comment) {
+    var list = document.getElementById('commentsList');
+    if (list.querySelector('div[style*="text-align:center"]')) list.innerHTML = '';
+    if (comment.id && list.querySelector('[data-comment-id="' + comment.id + '"]')) return;
+    var div = document.createElement('div');
+    div.innerHTML = commentHtml(comment);
+    list.appendChild(div.firstElementChild);
+    list.scrollTop = list.scrollHeight;
+}
+
+function commentHtml(c) {
+    var time = c.created_at ? new Date(c.created_at).toLocaleTimeString('ru') : '';
+    return '<div class="comment-item" data-comment-id="' + (c.id || '') + '">'
+        + '<div class="comment-author">' + escapeHtml(c.author_name || c.authorName || 'Аноним') + '</div>'
+        + '<div class="comment-text">' + escapeHtml(c.text) + '</div>'
+        + '<div class="comment-time">' + time + '</div>'
+        + '</div>';
+}
+
+// ======================== PLAYBACK ========================
+async function getPlaybackGrant() {
+    if (!accessToken) return toast('Сначала авторизуйтесь', 'error');
+    if (!currentStreamId) return toast('Выберите стрим', 'error');
+    const result = await apiCall('POST', '/streams/playback', { stream_id: currentStreamId }, true);
+    showResponse('playbackResponse', result);
+    if (result.ok) {
+        const g = result.data.data;
+        document.getElementById('playbackInfo').style.display = 'block';
+        document.getElementById('playbackUrl').textContent = g.webrtc_url || g.WebRTCUrl || '—';
+        document.getElementById('playbackExpires').textContent = g.expires_at || g.ExpiresAt || '—';
+        toast('Playback grant получен!');
+    } else toast(result.data.message || 'Ошибка (стрим должен быть LIVE)', 'error');
+}
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sport Portal — Тестовая панель</title>
+    <style>
+        :root {
+            --bg: #0f1117;
+            --card: #1a1d27;
+            --border: #2a2d3a;
+            --primary: #6366f1;
+            --primary-hover: #818cf8;
+            --success: #22c55e;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --input-bg: #0f1117;
+            --live: #ef4444;
+            --stream-bg: #161922;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            padding: 24px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .dot.off { background: var(--error); }
+        .dot.warn { background: var(--warning); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card-header .badge {
+            margin-left: auto;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .badge-public { background: rgba(34,197,94,0.15); color: var(--success); }
+        .badge-auth { background: rgba(99,102,241,0.15); color: var(--primary-hover); }
+        .badge-admin { background: rgba(239,68,68,0.15); color: var(--error); }
+
+        .card-body { padding: 20px; }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        }
+
+        textarea { resize: vertical; min-height: 80px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #16a34a; }
+
+        .btn-danger { background: var(--error); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+        .btn-sm { padding: 6px 12px; font-size: 12px; width: auto; }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .response-box {
+            margin-top: 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .response-box.show { display: block; }
+
+        .response-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .response-header.success { color: var(--success); }
+        .response-header.error { color: var(--error); }
+
+        .response-body {
+            padding: 12px 14px;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            max-height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            color: var(--text-muted);
+        }
+
+        .token-display {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            font-size: 11px;
+            font-family: monospace;
+            word-break: break-all;
+            color: var(--success);
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label { color: var(--text-muted); }
+        .info-row .value { font-weight: 600; }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 16px 0;
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .news-item {
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .news-item h4 { font-size: 14px; margin-bottom: 4px; }
+        .news-item p { font-size: 12px; color: var(--text-muted); }
+
+        .tab-group {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab:hover { color: var(--text); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--success); color: white; }
+        .toast.error { background: var(--error); color: white; }
+
+        .loading { opacity: 0.6; pointer-events: none; }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 12px;
+            }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>? Sport Portal — Тестовая панель</h1>
+    <p>Проверка всех API эндпоинтов</p>
+    <div class="status-bar">
+        <div class="status-item"><div class="dot" id="apiDot"></div><span id="apiStatus">API: проверка...</span></div>
+        <div class="status-item"><div class="dot off" id="authDot"></div><span id="authStatus">Не авторизован</span></div>
+        <div class="status-item"><div class="dot off" id="adminDot"></div><span id="adminStatus">Не админ</span></div>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Registration -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">??</div>
+            <h2>Регистрация</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <div class="tab-group">
+                <div class="tab active" onclick="switchTab('reg', 'email')">?? Email</div>
+                <div class="tab" onclick="switchTab('reg', 'phone')">?? Телефон</div>
+            </div>
+            <div id="reg-email" class="tab-content active">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" placeholder="user@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="regPassword" placeholder="Минимум 8 символов" value="password123">
+                </div>
+                <button class="btn btn-success" onclick="register()">Зарегистрироваться</button>
+            </div>
+            <div id="reg-phone" class="tab-content">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmailPhone" placeholder="user@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="regPasswordPhone" placeholder="Минимум 8 символов" value="password123">
+                </div>
+                <div class="form-group">
+                    <label>Firebase Token</label>
+                    <input type="text" id="regFirebaseToken" placeholder="ID Token от Firebase">
+                </div>
+                <button class="btn btn-success" onclick="registerPhone()">Зарегистрироваться (Phone)</button>
+            </div>
+            <div id="regResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- Verify Email -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;">??</div>
+            <h2>Подтверждение Email</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="verifyEmail" placeholder="user@example.com">
+            </div>
+            <div class="form-group">
+                <label>Код (6 цифр)</label>
+                <input type="text" id="verifyCode" placeholder="123456" maxlength="6">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="verifyEmail()" style="flex:2">Подтвердить</button>
+                <button class="btn btn-outline" onclick="resendCode()" style="flex:1">Отправить код</button>
+            </div>
+            <div id="verifyResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- Login -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(99,102,241,0.15);color:#6366f1;">??</div>
+            <h2>Авторизация</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" value="admin@sportportal.com">
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" value="admin123">
+            </div>
+            <button class="btn btn-primary" onclick="login()">Войти</button>
+            <div class="btn-group" style="margin-top:8px">
+                <button class="btn btn-outline btn-sm" onclick="refreshToken()">?? Обновить токен</button>
+                <button class="btn btn-outline btn-sm" onclick="logout()">?? Выйти</button>
+            </div>
+            <div id="tokenDisplay" class="token-display" style="display:none"></div>
+            <div id="loginResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- User Profile -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(99,102,241,0.15);color:#818cf8;">??</div>
+            <h2>Профиль</h2>
+            <span class="badge badge-auth">AUTH</span>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-primary" onclick="getMe()">Получить профиль</button>
+            <div id="profileInfo" style="margin-top:14px;display:none">
+                <div class="info-row"><span class="label">ID</span><span class="value" id="profileId">—</span></div>
+                <div class="info-row"><span class="label">Email</span><span class="value" id="profileEmail">—</span></div>
+                <div class="info-row"><span class="label">Телефон</span><span class="value" id="profilePhone">—</span></div>
+                <div class="info-row"><span class="label">Роль</span><span class="value" id="profileRole">—</span></div>
+                <div class="info-row"><span class="label">Верифицирован</span><span class="value" id="profileVerified">—</span></div>
+                <div class="info-row"><span class="label">Создан</span><span class="value" id="profileCreated">—</span></div>
+            </div>
+            <div id="profileResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- News -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(59,130,246,0.15);color:#3b82f6;">??</div>
+            <h2>Новости</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <div class="btn-group" style="margin-bottom:14px">
+                <button class="btn btn-primary btn-sm" onclick="loadNews()">Загрузить новости</button>
+                <button class="btn btn-outline btn-sm" onclick="loadCategories()">Категории</button>
+            </div>
+            <div id="newsList"></div>
+            <div id="newsResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- Federations -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(168,85,247,0.15);color:#a855f7;">??</div>
+            <h2>Федерации</h2>
+            <span class="badge badge-public">PUBLIC</span>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-primary" onclick="loadFederations()">Загрузить федерации</button>
+            <div id="fedsList" style="margin-top:14px"></div>
+            <div id="fedsResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- Admin: Users -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(239,68,68,0.15);color:#ef4444;">??</div>
+            <h2>Пользователи (Админ)</h2>
+            <span class="badge badge-admin">ADMIN</span>
+        </div>
+        <div class="card-body">
+            <div class="btn-group" style="margin-bottom:14px">
+                <button class="btn btn-danger btn-sm" onclick="loadUsers()" style="flex:2">Загрузить пользователей</button>
+                <button class="btn btn-outline btn-sm" onclick="deleteNonAdmins()" style="flex:1;border-color:var(--error);color:var(--error)">??? Удалить всех (кроме админа)</button>
+            </div>
+            <div id="usersList" style="margin-top:14px"></div>
+            <div id="usersResponse" class="response-box"></div>
+        </div>
+    </div>
+
+    <!-- Seed Database -->
+    <div class="card">
+        <div class="card-header">
+            <div class="icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;">???</div>
+            <h2>Полезные ссылки</h2>
+        </div>
+        <div class="card-body">
+            <p class="section-title">Быстрые действия</p>
+            <div class="btn-group" style="flex-direction:column;gap:8px">
+                <a href="/admin" class="btn btn-primary" target="_blank">??? Открыть админку</a>
+                <button class="btn btn-outline" onclick="healthCheck()">?? API Health Check</button>
+                <button class="btn btn-outline" onclick="testAll()">?? Тест всех эндпоинтов</button>
+            </div>
+            <div class="divider"></div>
+            <p class="section-title">Информация</p>
+            <div class="info-row"><span class="label">API Base</span><span class="value">/api/v1</span></div>
+            <div class="info-row"><span class="label">Админка</span><span class="value">/admin</span></div>
+            <div class="info-row"><span class="label">Тест панель</span><span class="value">/test</span></div>
+            <div class="info-row"><span class="label">Админ логин</span><span class="value">admin@sportportal.com</span></div>
+            <div class="info-row"><span class="label">Админ пароль</span><span class="value">admin123</span></div>
+            <div id="healthResponse" class="response-box"></div>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const API = '/api/v1';
+let accessToken = localStorage.getItem('access_token') || '';
+let refreshTokenValue = localStorage.getItem('refresh_token') || '';
+
+// ---- Init ----
+document.addEventListener('DOMContentLoaded', () => {
+    checkApiStatus();
+    if (accessToken) updateAuthStatus(true);
+});
+
+// ---- Utils ----
+async function apiCall(method, path, body = null, auth = false) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (auth && accessToken) headers['Authorization'] = 'Bearer ' + accessToken;
+
+    const opts = { method, headers };
+    if (body) opts.body = JSON.stringify(body);
+
+    const res = await fetch(API + path, opts);
+    const data = await res.json();
+    return { status: res.status, ok: res.ok, data };
+}
+
+function showResponse(elementId, result) {
+    const box = document.getElementById(elementId);
+    box.className = 'response-box show';
+    box.innerHTML = `
+        <div class="response-header ${result.ok ? 'success' : 'error'}">
+            ${result.ok ? '?' : '?'} HTTP ${result.status}
+        </div>
+        <div class="response-body">${JSON.stringify(result.data, null, 2)}</div>
+    `;
+}
+
+function toast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type + ' show';
+    setTimeout(() => t.className = 'toast', 3000);
+}
+
+function switchTab(group, tab) {
+    document.querySelectorAll(`#${group}-email, #${group}-phone`).forEach(el => el.classList.remove('active'));
+    document.getElementById(`${group}-${tab}`).classList.add('active');
+    const tabs = document.getElementById(`${group}-${tab}`).closest('.card-body').querySelectorAll('.tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    tabs.forEach(t => { if (t.textContent.includes(tab === 'email' ? 'Email' : 'Телефон')) t.classList.add('active'); });
+}
+
+function updateAuthStatus(loggedIn, isAdmin = false) {
+    const authDot = document.getElementById('authDot');
+    const authStatus = document.getElementById('authStatus');
+    const adminDot = document.getElementById('adminDot');
+    const adminStatus = document.getElementById('adminStatus');
+
+    if (loggedIn) {
+        authDot.className = 'dot';
+        authStatus.textContent = 'Авторизован';
+    } else {
+        authDot.className = 'dot off';
+        authStatus.textContent = 'Не авторизован';
+        adminDot.className = 'dot off';
+        adminStatus.textContent = 'Не админ';
+    }
+
+    if (isAdmin) {
+        adminDot.className = 'dot';
+        adminStatus.textContent = 'Админ ?';
+    }
+}
+
+async function checkApiStatus() {
+    try {
+        const res = await fetch(API + '/news?page=1&limit=1');
+        const dot = document.getElementById('apiDot');
+        const status = document.getElementById('apiStatus');
+        if (res.ok) {
+            dot.className = 'dot';
+            status.textContent = 'API: онлайн';
+        } else {
+            dot.className = 'dot warn';
+            status.textContent = 'API: ошибка ' + res.status;
+        }
+    } catch {
+        document.getElementById('apiDot').className = 'dot off';
+        document.getElementById('apiStatus').textContent = 'API: недоступен';
+    }
+}
+
+// ---- Auth ----
+async function register() {
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    if (!email || !password) return toast('Заполните все поля', 'error');
+
+    const result = await apiCall('POST', '/auth/register', { email, password });
+    showResponse('regResponse', result);
+    toast(result.ok ? 'Пользователь создан! Проверьте email.' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+}
+
+async function registerPhone() {
+    const email = document.getElementById('regEmailPhone').value;
+    const password = document.getElementById('regPasswordPhone').value;
+    const firebase_token = document.getElementById('regFirebaseToken').value;
+    if (!email || !password || !firebase_token) return toast('Заполните все поля', 'error');
+
+    const result = await apiCall('POST', '/auth/register', { email, password, firebase_token });
+    showResponse('regResponse', result);
+    toast(result.ok ? 'Зарегистрирован через телефон!' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+}
+
+async function verifyEmail() {
+    const email = document.getElementById('verifyEmail').value;
+    const code = document.getElementById('verifyCode').value;
+    if (!email || !code) return toast('Заполните все поля', 'error');
+
+    const result = await apiCall('POST', '/auth/verify', { email, code });
+    showResponse('verifyResponse', result);
+    toast(result.ok ? 'Email подтверждён!' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+}
+
+async function resendCode() {
+    const email = document.getElementById('verifyEmail').value;
+    if (!email) return toast('Введите email', 'error');
+
+    const result = await apiCall('POST', '/auth/resend-code', { email });
+    showResponse('verifyResponse', result);
+    toast(result.ok ? 'Код отправлен!' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+}
+
+async function login() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) return toast('Заполните все поля', 'error');
+
+    const result = await apiCall('POST', '/auth/login', { email, password });
+    showResponse('loginResponse', result);
+
+    if (result.ok) {
+        accessToken = result.data.data.access_token;
+        refreshTokenValue = result.data.data.refresh_token;
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', refreshTokenValue);
+
+        const user = result.data.data.user;
+        const isAdmin = user.role === 'admin';
+        updateAuthStatus(true, isAdmin);
+
+        document.getElementById('tokenDisplay').style.display = 'block';
+        document.getElementById('tokenDisplay').textContent = 'Access Token: ' + accessToken.substring(0, 50) + '...';
+
+        toast('Вход выполнен! ' + (isAdmin ? '(Админ)' : '(Пользователь)'));
+    } else {
+        toast(result.data.message || 'Ошибка входа', 'error');
+    }
+}
+
+async function refreshToken() {
+    if (!refreshTokenValue) return toast('Нет refresh токена', 'error');
+
+    const result = await apiCall('POST', '/auth/refresh', { refresh_token: refreshTokenValue });
+    showResponse('loginResponse', result);
+
+    if (result.ok) {
+        accessToken = result.data.data.access_token;
+        refreshTokenValue = result.data.data.refresh_token;
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', refreshTokenValue);
+        document.getElementById('tokenDisplay').textContent = 'Access Token (обновлён): ' + accessToken.substring(0, 50) + '...';
+        toast('Токен обновлён!');
+    } else {
+        toast('Ошибка обновления', 'error');
+    }
+}
+
+function logout() {
+    accessToken = '';
+    refreshTokenValue = '';
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    document.getElementById('tokenDisplay').style.display = 'none';
+    updateAuthStatus(false);
+    toast('Вы вышли');
+}
+
+// ---- Profile ----
+async function getMe() {
+    if (!accessToken) return toast('Сначала авторизуйтесь', 'error');
+
+    const result = await apiCall('GET', '/users/me', null, true);
+    showResponse('profileResponse', result);
+
+    if (result.ok) {
+        const u = result.data.data;
+        document.getElementById('profileInfo').style.display = 'block';
+        document.getElementById('profileId').textContent = u.id;
+        document.getElementById('profileEmail').textContent = u.email;
+        document.getElementById('profilePhone').textContent = u.phone || '—';
+        document.getElementById('profileRole').textContent = u.role;
+        document.getElementById('profileVerified').textContent = u.is_verified ? '? Да' : '? Нет';
+        document.getElementById('profileCreated').textContent = new Date(u.created_at).toLocaleString('ru');
+        updateAuthStatus(true, u.role === 'admin');
+    }
+}
+
+// ---- News ----
+async function loadNews() {
+    const result = await apiCall('GET', '/news?page=1&limit=5');
+    showResponse('newsResponse', result);
+
+    if (result.ok) {
+        const items = result.data.data || [];
+        const list = document.getElementById('newsList');
+        if (items.length === 0) {
+            list.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Нет новостей. Создайте через админку.</p>';
+        } else {
+            list.innerHTML = items.map(n => `
+                <div class="news-item">
+                    <h4>${escapeHtml(n.title)}</h4>
+                    <p>${escapeHtml((n.content || '').substring(0, 100))}...</p>
+                    <div style="display:flex;gap:12px;margin-top:6px;font-size:11px;color:var(--text-muted)">
+                        <span>?? ${n.likes_count || 0}</span>
+                        <span>?? ${n.shares_count || 0}</span>
+                        ${accessToken ? `<span style="cursor:pointer;color:var(--primary)" onclick="toggleLike('${n.id}')">?? Лайк</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+}
+
+async function toggleLike(newsId) {
+    if (!accessToken) return toast('Сначала авторизуйтесь', 'error');
+    const result = await apiCall('POST', `/news/${newsId}/like`, null, true);
+    toast(result.ok ? 'Лайк!' : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+    if (result.ok) loadNews();
+}
+
+async function loadCategories() {
+    const result = await apiCall('GET', '/categories');
+    showResponse('newsResponse', result);
+    toast(result.ok ? `Категорий: ${(result.data.data || []).length}` : 'Ошибка', result.ok ? 'success' : 'error');
+}
+
+// ---- Federations ----
+async function loadFederations() {
+    const result = await apiCall('GET', '/federations');
+    showResponse('fedsResponse', result);
+
+    if (result.ok) {
+        const items = result.data.data || [];
+        const list = document.getElementById('fedsList');
+        if (items.length === 0) {
+            list.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Нет федераций. Создайте через админку.</p>';
+        } else {
+            list.innerHTML = items.map(f => `
+                <div class="news-item">
+                    <h4>${escapeHtml(f.name)}</h4>
+                    <p>${escapeHtml((f.description || '').substring(0, 100))}</p>
+                </div>
+            `).join('');
+        }
+    }
+}
+
+// ---- Admin ----
+async function loadUsers() {
+    if (!accessToken) return toast('Сначала авторизуйтесь', 'error');
+
+    const result = await apiCall('GET', '/admin/users', null, true);
+    showResponse('usersResponse', result);
+
+    if (result.ok) {
+        const items = result.data.data || [];
+        const list = document.getElementById('usersList');
+        list.innerHTML = items.map(u => `
+            <div class="news-item">
+                <h4>${escapeHtml(u.email)} <span style="font-size:11px;color:${u.role === 'admin' ? 'var(--error)' : 'var(--primary)'}">[${u.role}]</span></h4>
+                <p>${u.is_verified ? '? Верифицирован' : '? Не верифицирован'} · ${u.phone || 'Нет телефона'}</p>
+            </div>
+        `).join('');
+    }
+}
+
+async function deleteNonAdmins() {
+    if (!accessToken) return toast('Сначала авторизуйтесь как админ', 'error');
+    if (!confirm('Удалить ВСЕХ пользователей кроме админов?')) return;
+
+    const result = await apiCall('DELETE', '/admin/users', null, true);
+    showResponse('usersResponse', result);
+    toast(result.ok ? result.data.message : result.data.message || 'Ошибка', result.ok ? 'success' : 'error');
+    if (result.ok) loadUsers();
+}
+
+// ---- Health ----
+async function healthCheck() {
+    const endpoints = [
+        { method: 'GET', path: '/news?page=1&limit=1', name: 'News' },
+        { method: 'GET', path: '/categories', name: 'Categories' },
+        { method: 'GET', path: '/federations', name: 'Federations' },
+    ];
+
+    let results = [];
+    for (const ep of endpoints) {
+        try {
+            const r = await apiCall(ep.method, ep.path);
+            results.push(`${r.ok ? '?' : '?'} ${ep.name}: HTTP ${r.status}`);
+        } catch {
+            results.push(`? ${ep.name}: Недоступен`);
+        }
+    }
+
+    showResponse('healthResponse', { ok: true, status: 200, data: results.join('\n') });
+    toast('Health check завершён');
+}
+
+async function testAll() {
+    toast('Запуск тестов...');
+    await checkApiStatus();
+    await healthCheck();
+    if (accessToken) await getMe();
+    toast('Все тесты завершены');
+}
+
+function escapeHtml(text) {
+    const d = document.createElement('div');
+    d.textContent = text || '';
+    return d.innerHTML;
+}
+</script>
+
+</body>
+</html>
+

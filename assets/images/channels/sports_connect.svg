@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 240">
+  <g fill="none" stroke="#64b5ff" stroke-width="14" stroke-linecap="round">
+    <path d="M124 94c20-20 52-20 72 0l16 16c20 20 20 52 0 72s-52 20-72 0" />
+    <path d="M228 146c-20 20-52 20-72 0l-16-16c-20-20-20-52 0-72s52-20 72 0" opacity="0" />
+    <path d="M192 120h88" />
+    <path d="M276 94c20-20 52-20 72 0l16 16c20 20 20 52 0 72s-52 20-72 0" />
+  </g>
+  <text x="456" y="108" text-anchor="middle" font-size="42" font-family="Arial, Helvetica, sans-serif" font-weight="800" fill="#ffffff">SPORTS</text>
+  <text x="456" y="164" text-anchor="middle" font-size="42" font-family="Arial, Helvetica, sans-serif" font-weight="800" fill="#64b5ff">CONNECT</text>
+</svg>
