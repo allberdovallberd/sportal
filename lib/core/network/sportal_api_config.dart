@@ -21,7 +21,7 @@ class SportalApiConfig {
 
   static const String _defaultApiHost = String.fromEnvironment(
     'SPORTAL_API_HOST',
-    defaultValue: 'https://asyllypent.com.tm/sport',
+    defaultValue: 'https://yourserverhere.com.tm/sport',
   );
 
   static const String _defaultApiBaseUrl = String.fromEnvironment(
@@ -31,12 +31,12 @@ class SportalApiConfig {
 
   static const String _defaultStreamHttpBaseUrl = String.fromEnvironment(
     'SPORTAL_STREAM_HTTP_BASE_URL',
-    defaultValue: 'https://asyllypent.com.tm/sport',
+    defaultValue: 'https://yourserverhere.com.tm/sport',
   );
 
   static const String _defaultStreamWebRtcBaseUrl = String.fromEnvironment(
     'SPORTAL_STREAM_WEBRTC_BASE_URL',
-    defaultValue: 'webrtc://asyllypent.com.tm/sport/live/',
+    defaultValue: 'webrtc://yourserverhere.com.tm/sport/live/',
   );
 
   static const String authLoginPath = '/auth/login';
